@@ -2,7 +2,8 @@ import React, {Component} from 'react';
 import logo from './logo.svg';
 import './App.css';
 import $ from "jquery"
-import Game from "./components/Game"
+import Scifi from "./components/Scifi"
+import ComponentChecker from "./components/ComponentChecker"
 
 let localhost = "http://192.168.43.102:3000";
 
@@ -44,6 +45,10 @@ class App extends Component {
             return this.state.num_of_blocks;
         };
 
+        this.getArr = () => {
+            return this.state.elements;
+        };
+
         this.dropAuth = () => {
             this.setState((prev) => {
                 return {
@@ -69,6 +74,13 @@ class App extends Component {
                     num_of_blocks: prev.num_of_blocks
                 }
             })
+        };
+
+        this.toPercentBoxes = () =>{
+            this.setState((prev)=>{
+                for (let i=0;i<prev.elements.length;i++)
+                    prev.elements[i] *= 2.5;
+            });
         }
     }
 
@@ -104,6 +116,7 @@ class App extends Component {
             crossDomain: true,
             success: function (data) {
                 theme = data;
+                console.log(theme);
                 localStorage.setItem("theme", JSON.stringify(theme));
             },
             fail: function (err) {
@@ -125,7 +138,7 @@ class App extends Component {
     render() {
 
         return (
-            <Game theme={JSON.parse(localStorage.getItem("theme"))}/>
+            <ComponentChecker theme={JSON.parse(localStorage.getItem("theme"))}/>
             /*
             <div className="auth_place">
                 <div className="auth_block">
@@ -146,17 +159,37 @@ class App extends Component {
         let theme = JSON.parse(localStorage.getItem("theme"));
 
         let getNum = this.getNum;
+        let getArr = this.getArr;
+        let addedArr =[];
 
         $('.pictures').on("mousedown", function () {
             let id = $(this).attr("id");
+            if (addedArr.indexOf(id)){
+                addedArr.push(id);
+            }
             let th = theme;
             child = setInterval(function () {
                 if (getNum() !== 40) {
+                    let htmlIn = "";
+                    addEll(id);
+                    let arr = getArr();
                     if (theme.color) {
-                        $('.fl').append('<div class="ch" style="background-color:' + th.colorsArr[id] + '"></div>');
+                        htmlIn = "";
+                        for (let i = 0; i < addedArr.length; i++)
+                            for (let j = 0; j < arr[Number(addedArr[i])]; j++) {
+                                htmlIn += '<div class="ch" style="background-color:' + th.colorsArr[Number(addedArr[i])] + '"></div>';
+                            }
+                        $('.fl').html(htmlIn);
                     } else
                         $('.fl').append('<div class = "ch" ></div>');
-                    addEll(id);
+                }
+                else {
+                    for (let i=0;i<th.imgCount;i++){
+
+                    }
+                    $.ajax({
+                        url: localhost + "/",
+                    })
                 }
             }, 200 * theme.speed);
         });

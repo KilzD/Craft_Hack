@@ -1,13 +1,13 @@
 import React from "react"
-import "../css/scifi.css"
+import "../css/cyberpunk.css"
 import $ from "jquery"
 
-function Game(props) {
+function Cyberpunk(props) {
 
     return (
-        <div className="center">
+        <div className="main_site_page">
             <div className="icons">
-                {Array.from({length: 8}).map((_, idx) =>
+                {Array.from({length: props.theme.imgCount}).map((_, idx) =>
                     <img src={"images/" + props.theme.img + "/icon" + (idx + 1) + ".png"} id={idx} key={"ic" + idx} className="pictures" alt=""></img>)}
             </div>
             <div className="hid">
@@ -18,4 +18,4 @@ function Game(props) {
     )
 }
 
-export default Game;
+export default Cyberpunk;
