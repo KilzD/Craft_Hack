@@ -31,3 +31,21 @@
     transform: rotate(360deg);
   }
 }
+
+.auth_place{
+
+}
+
+.auth_block{
+  display: flex;
+  flex-direction: column;
+  width: 280px;
+  margin: 0 auto;
+  padding: 10px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);}
+
+.input{
+  margin: 8px auto 0;
+}
