@@ -1,5 +1,4 @@
 import React from "react"
-import "../css/cyberpunk.css"
 import $ from "jquery"
 
 function Cyberpunk(props) {

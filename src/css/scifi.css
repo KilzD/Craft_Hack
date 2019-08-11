@@ -4,7 +4,6 @@ body {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    background-image: url('../backgrounds/scifi.png');
     background-size: cover;
 }
 
@@ -58,10 +57,10 @@ body {
 
 .ch {
     background-color: #3f646b;
-    width: 2%;
+    width: 2.3%;
     height: 100%;
-    margin-left: 1.5px;
-    margin-right: 1.5px;
+    margin-left: 0.1%;
+    margin-right: 0.1%;
     /* border-radius: 3px; */
 }
 

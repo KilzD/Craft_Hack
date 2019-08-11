@@ -2,8 +2,8 @@ import React, {Component} from 'react';
 import logo from './logo.svg';
 import './App.css';
 import $ from "jquery"
-import Scifi from "./components/Scifi"
 import ComponentChecker from "./components/ComponentChecker"
+import Fantasy from "./components/Fantasy"
 
 let localhost = "http://192.168.43.102:3000";
 
@@ -29,10 +29,7 @@ class App extends Component {
         this.addElement = (id) => this.setState((prev) => {
 
             let arr = prev.elements.slice();
-            console.log(id);
             ++arr[id];
-
-            console.log(arr);
 
             return {
                 id: prev.id,
@@ -76,10 +73,29 @@ class App extends Component {
             })
         };
 
-        this.toPercentBoxes = () =>{
-            this.setState((prev)=>{
-                for (let i=0;i<prev.elements.length;i++)
+        this.dropData = () => {
+            let arr = [];
+
+            for (let i = 0; i < JSON.parse(localStorage.getItem("theme")).imgCount; i++)
+                arr.push(0);
+            this.setState((prev) => {
+                return {
+                    id: prev.id,
+                    elements: arr,
+                    num_of_blocks: 0
+                }
+            });
+        };
+
+        this.toPercentBoxes = () => {
+            this.setState((prev) => {
+                for (let i = 0; i < prev.elements.length; i++)
                     prev.elements[i] *= 2.5;
+                return {
+                    id: prev.id,
+                    elements: prev.elements,
+                    num_of_blocks: prev.num_of_blocks
+                }
             });
         }
     }
@@ -129,7 +145,7 @@ class App extends Component {
 
 
     componentWillMount() {
-
+        console.log("Выполнено");
         let func = this.auth;
         let theme = this.GetTheme();
         this.elementsNumberDef(theme);
@@ -138,7 +154,14 @@ class App extends Component {
     render() {
 
         return (
-            <ComponentChecker theme={JSON.parse(localStorage.getItem("theme"))}/>
+            <div>
+                {/*<div id='megaflex' className="mega">*/}
+                {/*    <p id='result'></p>*/}
+                {/*    <button id='btn' type="button" name="button">Выйти</button>*/}
+                {/*    <button id='btn2' type="button" name="button">Попробовать ещё</button>*/}
+                {/*</div>*/}
+                <ComponentChecker theme={JSON.parse(localStorage.getItem("theme"))}/>
+            </div>
             /*
             <div className="auth_place">
                 <div className="auth_block">
@@ -153,53 +176,110 @@ class App extends Component {
 
     componentDidMount() {
 
-        let child;
+
+        let sync = true;
         let addEll = this.addElement;
+        let killProcess = false;
 
         let theme = JSON.parse(localStorage.getItem("theme"));
 
         let getNum = this.getNum;
         let getArr = this.getArr;
-        let addedArr =[];
+        let childs = [];
+        let dropdata = this.dropData;
+        let toPercent = this.toPercentBoxes;
+        let addedArr = [];
 
         $('.pictures').on("mousedown", function () {
-            let id = $(this).attr("id");
-            if (addedArr.indexOf(id)){
-                addedArr.push(id);
-            }
-            let th = theme;
-            child = setInterval(function () {
-                if (getNum() !== 40) {
-                    let htmlIn = "";
-                    addEll(id);
-                    let arr = getArr();
-                    if (theme.color) {
-                        htmlIn = "";
-                        for (let i = 0; i < addedArr.length; i++)
-                            for (let j = 0; j < arr[Number(addedArr[i])]; j++) {
-                                htmlIn += '<div class="ch" style="background-color:' + th.colorsArr[Number(addedArr[i])] + '"></div>';
-                            }
-                        $('.fl').html(htmlIn);
-                    } else
-                        $('.fl').append('<div class = "ch" ></div>');
+            if (sync) {
+                sync = false;
+                let id = $(this).attr("id");
+                if (addedArr.indexOf(id)) {
+                    addedArr.push(id);
+                }
+                let th = theme;
+
+                if ((th.progressbar !== "cyberpunk") && (th.progressbar !== "scifi")) {
+                    childs.push(setInterval(function () {
+                        if (getNum() !== 40) {
+                            addEll(id);
+                            $('.element').css("height", (760 / 40 * getNum() + "px"));
+                            console.log(getNum());
+                        } else {
+                            toPercent();
+                            $.ajax({
+                                url: localhost + "/state",
+                                type: "post",
+                                data: {recipe: getArr()},
+                                success: function (data) {
+                                    console.log(data);
+                                    dropdata();
+                                    $('.element').html("");
+                                    $('#megaflex').css("display", "block");
+                                    $('#result').html("У вас получилось: " + data.name);
+                                },
+                                error: function (err) {
+                                    console.log("У вас не получилось зелье!");
+                                    dropdata();
+                                    $('.fl').html("");
+                                    $('#megaflex').css("display", "block");
+                                    $('#result').html("У вас ничего не вышло!");
+                                }
+                            })
+                        }
+                    }, 200 * theme.speed));
                 }
                 else {
-                    for (let i=0;i<th.imgCount;i++){
-
-                    }
-                    $.ajax({
-                        url: localhost + "/",
-                    })
+                    childs.push(setInterval(function () {
+                        if (getNum() !== 40) {
+                            addEll(id);
+                            let arr = getArr();
+                            if (theme.color) {
+                                let htmlIn = "";
+                                for (let i = 0; i < addedArr.length; i++)
+                                    for (let j = 0; j < arr[Number(addedArr[i])]; j++) {
+                                        htmlIn += '<div class="ch" style="background-color:' + th.colorsArr[Number(addedArr[i])] + '"></div>';
+                                    }
+                                $('.fl').html(htmlIn);
+                            } else
+                                $('.fl').append('<div class = "ch" ></div>');
+                        } else {
+                            toPercent();
+                            $.ajax({
+                                url: localhost + "/state",
+                                type: "post",
+                                data: {recipe: getArr()},
+                                success: function (data) {
+                                    console.log(data);
+                                    dropdata();
+                                    $('.fl').html("");
+                                    $('#megaflex').css("display", "block");
+                                    $('#result').html("У вас получилось: " + data.name);
+                                },
+                                error: function (err) {
+                                    dropdata();
+                                    $('.fl').html("");
+                                    $('#megaflex').css("display", "block");
+                                    $('#result').html("У вас ничего не вышло!");
+                                }
+                            })
+                        }
+                    }, 200 * theme.speed));
                 }
-            }, 200 * theme.speed);
+                sync = true;
+            }
         });
 
         $('.pictures').on('mouseleave', function () {
-            clearInterval(child);
+            childs.forEach(function (child) {
+                clearInterval(child);
+            })
         });
 
         $('.pictures').on("mouseup", function () {
-            clearInterval(child);
+            childs.forEach(function (child) {
+                clearInterval(child);
+            })
         });
     }
 

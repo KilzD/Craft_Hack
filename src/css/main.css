@@ -4,7 +4,6 @@ body{
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
-  background-image: url(/img/image1.png);
   background-size: cover;
 }
 .icons{
