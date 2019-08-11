@@ -155,11 +155,6 @@ class App extends Component {
 
         return (
             <div>
-                {/*<div id='megaflex' className="mega">*/}
-                {/*    <p id='result'></p>*/}
-                {/*    <button id='btn' type="button" name="button">Выйти</button>*/}
-                {/*    <button id='btn2' type="button" name="button">Попробовать ещё</button>*/}
-                {/*</div>*/}
                 <ComponentChecker theme={JSON.parse(localStorage.getItem("theme"))}/>
             </div>
             /*
@@ -176,21 +171,28 @@ class App extends Component {
 
     componentDidMount() {
 
-
         let sync = true;
-        let addEll = this.addElement;
+        let addedArr = [];
         let killProcess = false;
+        let childs = [];
+        let ajax = 0;
 
         let theme = JSON.parse(localStorage.getItem("theme"));
 
         let getNum = this.getNum;
         let getArr = this.getArr;
-        let childs = [];
+        let addEll = this.addElement;
         let dropdata = this.dropData;
         let toPercent = this.toPercentBoxes;
-        let addedArr = [];
 
-        $('.pictures').on("mousedown", function () {
+        $( "#btn2" ).click(function() {
+            $('#megaflex').css("display", "none");
+        });
+
+        $('#btn').onclick = {};
+        $('#btn2').onclick =
+
+        $('.pictures').on("mousedown touchstart", function () {
             if (sync) {
                 sync = false;
                 let id = $(this).attr("id");
@@ -206,26 +208,32 @@ class App extends Component {
                             $('.element').css("height", (760 / 40 * getNum() + "px"));
                             console.log(getNum());
                         } else {
-                            toPercent();
-                            $.ajax({
-                                url: localhost + "/state",
-                                type: "post",
-                                data: {recipe: getArr()},
-                                success: function (data) {
-                                    console.log(data);
-                                    dropdata();
-                                    $('.element').html("");
-                                    $('#megaflex').css("display", "block");
-                                    $('#result').html("У вас получилось: " + data.name);
-                                },
-                                error: function (err) {
-                                    console.log("У вас не получилось зелье!");
-                                    dropdata();
-                                    $('.fl').html("");
-                                    $('#megaflex').css("display", "block");
-                                    $('#result').html("У вас ничего не вышло!");
-                                }
-                            })
+                            if (ajax === 0) {
+                                ajax = 1;
+                                toPercent();
+                                $('.element').css("height", (0));
+                                setTimeout($('#megaflex').css("display", "block"), 200);
+                                $.ajax({
+                                    url: localhost + "/state",
+                                    type: "post",
+                                    data: {recipe: getArr()},
+                                    success: function (data) {
+                                        console.log(data);
+                                        dropdata();
+                                        $('.element').html("");
+                                        $('#result').html("У вас получилось: " + data.name);
+                                        ajax = 0;
+                                    },
+                                    error: function (err) {
+                                        console.log("У вас не получилось зелье!");
+                                        dropdata();
+                                        $('.fl').html("");
+                                        $('#result').html("У вас ничего не вышло!");
+                                        ajax = 0;
+                                    }
+
+                                })
+                            }
                         }
                     }, 200 * theme.speed));
                 }
@@ -244,33 +252,37 @@ class App extends Component {
                             } else
                                 $('.fl').append('<div class = "ch" ></div>');
                         } else {
-                            toPercent();
-                            $.ajax({
-                                url: localhost + "/state",
-                                type: "post",
-                                data: {recipe: getArr()},
-                                success: function (data) {
-                                    console.log(data);
-                                    dropdata();
-                                    $('.fl').html("");
-                                    $('#megaflex').css("display", "block");
-                                    $('#result').html("У вас получилось: " + data.name);
-                                },
-                                error: function (err) {
-                                    dropdata();
-                                    $('.fl').html("");
-                                    $('#megaflex').css("display", "block");
-                                    $('#result').html("У вас ничего не вышло!");
-                                }
-                            })
+                            if (ajax === 0) {
+                                ajax = 1;
+                                toPercent();
+                                setTimeout($('#megaflex').css("display", "block"), 200);
+                                $.ajax({
+                                    url: localhost + "/state",
+                                    type: "post",
+                                    data: {recipe: getArr()},
+                                    success: function (data) {
+                                        console.log(data);
+                                        dropdata();
+                                        $('.fl').html("");
+                                        $('#result').html("У вас получилось: " + data.name);
+                                        ajax = 0;
+                                    },
+                                    error: function (err) {
+                                        dropdata();
+                                        $('.fl').html("");
+                                        $('#result').html("У вас ничего не вышло!");
+                                        ajax = 0;
+                                    }
+                                })
+                            }
                         }
-                    }, 200 * theme.speed));
+                    }, 200 * theme.speed * th.mastery));
                 }
                 sync = true;
             }
         });
 
-        $('.pictures').on('mouseleave', function () {
+        $('.pictures').on('mouseleave touchend', function () {
             childs.forEach(function (child) {
                 clearInterval(child);
             })

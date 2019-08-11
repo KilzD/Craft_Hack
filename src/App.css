@@ -34,7 +34,7 @@
 #megaflex{
   width: 100%;
   height: 100vh;
-  background-color: #909080;
+  background-color: #F0FFF0	;
   position: fixed;
    display: none;
   /* border: 2px solid #fff; */
@@ -45,7 +45,7 @@
 }
 #result{
   height: 30px;
-  color: #fff;
+  color: #000;
   margin: 20px;
   font-size: 30px;
   text-align: center;
@@ -61,7 +61,7 @@
 }
 #btn {
   /*left: 20%;*/
-  margin-left: 82vh;
+  margin-left: calc(42.5% - 100px);
 }
 #btn2{
   left: 15%;
